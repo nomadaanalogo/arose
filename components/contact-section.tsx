@@ -16,7 +16,9 @@ export default function ContactSection() {
     email: "",
     service: "",
     details: "",
+    website: "", // honeypot
   })
+  const [loadTime] = useState(() => Date.now())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const router = useRouter()
@@ -45,6 +47,8 @@ export default function ContactSection() {
       formDataToSend.append("email", formData.email)
       formDataToSend.append("service", formData.service)
       formDataToSend.append("details", formData.details)
+      formDataToSend.append("website", formData.website)
+      formDataToSend.append("elapsed", String(Date.now() - loadTime))
 
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
@@ -180,6 +184,18 @@ export default function ContactSection() {
                   onChange={(e) => handleInputChange("details", e.target.value)}
                   className="border-b-2 border-zinc-200 rounded-none px-0 py-3 min-h-[100px] resize-none focus:border-blue-600 transition-colors text-zinc-800 placeholder:text-zinc-400"
                   placeholder="Tell us about your project, timeline, budget, or any specific requirements..."
+                />
+              </div>
+
+              {/* honeypot - hidden from real users */}
+              <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={formData.website}
+                  onChange={(e) => handleInputChange("website", e.target.value)}
                 />
               </div>
 
