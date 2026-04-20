@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import type { JSX } from "react"
 
 // Helper function to render description with consistent strong tag styling
@@ -194,24 +195,21 @@ export default function ServicesSection() {
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {services.map((service, index) => (
-            <div
-              key={index}
-              className="group cursor-pointer p-6 rounded-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 hover:shadow-xl hover:scale-105 hover:from-blue-100 hover:to-blue-150"
-            >
-              <div className="aspect-[4/3] mb-4 overflow-hidden relative rounded-lg">
-                <Image
-                  src={service.image || "/placeholder.svg"}
-                  alt={service.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                  quality={50}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
+            <Dialog key={index}>
+              <div className="group p-6 rounded-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 hover:shadow-xl hover:scale-105 hover:from-blue-100 hover:to-blue-150">
+                <div className="aspect-[4/3] mb-4 overflow-hidden relative rounded-lg">
+                  <Image
+                    src={service.image || "/placeholder.svg"}
+                    alt={service.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                    quality={50}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
 
-                {/* See More Button Overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
-                  <Dialog>
+                  {/* Hover overlay — desktop only */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
@@ -221,39 +219,61 @@ export default function ServicesSection() {
                         See More
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="text-2xl font-light">{service.title}</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid grid-cols-2 gap-4 mt-6">
-                        {service.galleryImages.map((img, i) => (
-                          <div key={i} className="aspect-square bg-slate-100 rounded-lg overflow-hidden relative">
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-slate-900 group-hover:text-blue-800 transition-colors font-bold text-xl">
+                    {service.title}
+                  </h3>
+                  <div className="text-slate-700 leading-relaxed text-sm">
+                    <ServiceDescription description={service.description} />
+                  </div>
+
+                  {/* Always visible on mobile */}
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="md:hidden mt-2 border-blue-300 text-blue-700 hover:bg-blue-50"
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      See Gallery
+                    </Button>
+                  </DialogTrigger>
+                </div>
+              </div>
+
+              <DialogContent className="max-w-2xl w-[95vw] p-4 md:p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-light">{service.title}</DialogTitle>
+                </DialogHeader>
+                <div className="mt-4 px-8">
+                  <Carousel opts={{ loop: true }}>
+                    <CarouselContent>
+                      {service.galleryImages.map((img, i) => (
+                        <CarouselItem key={i}>
+                          <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-slate-100">
                             <Image
                               src={img || "/placeholder.svg"}
                               alt={`${service.title} ${i + 1}`}
                               fill
-                              className="object-cover hover:scale-105 transition-transform duration-300"
+                              className="object-cover"
                               loading="lazy"
-                              quality={50}
-                              sizes="(max-width: 640px) 50vw, 25vw"
+                              quality={75}
+                              sizes="(max-width: 640px) 90vw, 600px"
                             />
                           </div>
-                        ))}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                          <p className="text-center text-sm text-slate-400 mt-2">{i + 1} / {service.galleryImages.length}</p>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="-left-8" />
+                    <CarouselNext className="-right-8" />
+                  </Carousel>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-slate-900 group-hover:text-blue-800 transition-colors font-bold text-xl">
-                  {service.title}
-                </h3>
-                <div className="text-slate-700 leading-relaxed text-sm">
-                  <ServiceDescription description={service.description} />
-                </div>
-              </div>
-            </div>
+              </DialogContent>
+            </Dialog>
           ))}
         </div>
 
